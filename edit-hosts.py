@@ -5,6 +5,34 @@ from PyQt4 import QtCore
 from PyQt4 import QtGui
 
 
+class AboutDialog(QtGui.QDialog):
+    PROJECT_URL = "https://github.com/adamwojs/hosts-editor"
+
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+
+        self._header = QtGui.QLabel(self)
+        self._header.setText("<h3>Hosts file editor</h3>")
+
+        self._description = QtGui.QLabel(self)
+        self._description.setText("<p>/etc/hosts file editor written in Python with PyQT</p>")
+
+        self._projectWebsite = QtGui.QPushButton(self)
+        self._projectWebsite.setText("Visit Github Page")
+        self._projectWebsite.clicked.connect(self.openProjectWebsite)
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self._header)
+        layout.addWidget(self._description, )
+        layout.addWidget(self._projectWebsite)
+
+        self.setLayout(layout)
+        self.setWindowTitle("About /etc/hosts editor")
+        self.resize(300, 200)
+
+    def openProjectWebsite(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.PROJECT_URL))
+
 class EditorModel(QtCore.QAbstractTableModel):
     HOSTS_FILE = "/etc/hosts"
 
@@ -235,6 +263,10 @@ class Editor(QtGui.QMainWindow):
         for index in selection:
             self._proxy.removeRows(index.row(), 1, index.parent())
 
+    def about(self):
+        about = AboutDialog()
+        about.exec_()
+
     def createMenu(self):
         reload = QtGui.QAction('Reload', self)
         reload.setShortcut('Ctrl+R')
@@ -263,6 +295,7 @@ class Editor(QtGui.QMainWindow):
         delete.triggered.connect(self.remove)
 
         about = QtGui.QAction('About', self)
+        about.triggered.connect(self.about)
 
         file = self.menuBar().addMenu('&File')
         file.addAction(reload)
